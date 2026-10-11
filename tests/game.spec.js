@@ -15,7 +15,7 @@ async function fixtureServer(options = {}) {
       response.writeHead(503); response.end('Intentionally unavailable fixture'); return;
     }
     let body = fs.readFileSync(path.join(__dirname, '..', filename));
-    if (filename === 'sw.js') body = body.toString().replace('shell:v1', `shell:test-${revision}`);
+    if (filename === 'sw.js') body = body.toString().replace('shell:v2', `shell:test-${revision}`);
     response.setHeader('Content-Type', filename.endsWith('.js') ? 'text/javascript' : filename.endsWith('.svg') ? 'image/svg+xml' : filename.endsWith('.html') ? 'text/html' : 'application/manifest+json');
     response.end(body);
   });
@@ -45,18 +45,118 @@ async function choose(page, family, count = 2) {
   await page.getByLabel('Pieces').selectOption(String(count));
   await page.getByRole('button', { name: 'Back to the garden' }).click();
 }
+async function openDetails(page, selector) {
+  const panel = page.locator(selector);
+  if (await panel.getAttribute('open') === null) await panel.locator('summary').click();
+}
 async function build(page, family, count = 2) {
   await choose(page, family, count);
   for (let i = 0; i < count; i++) {
     await page.locator(`[data-source="part:${i}"]`).click();
     await page.locator(`[data-slot="${i}"]`).click();
   }
+  await openDetails(page, '#explore');
+  await openDetails(page, '#remix-panel');
   await expect(page.locator(`[data-source="toy:${family}"]`)).toBeVisible();
 }
 async function move(page, source, destination) {
+  await openDetails(page, '#explore');
   await page.locator(`[data-source="${source}"]`).click();
   await page.locator(`[data-dest="${destination}"]`).click();
 }
+
+test('the visible controls explain a complete loop without settings or free-exploration controls', async ({ page }, info) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await start(page);
+  await expect(page.locator('#caregiver')).toBeHidden();
+  await expect(page.locator('#zones')).toBeHidden();
+  await expect(page.locator('#instruction')).toHaveText('Tap a piece below to start.');
+  for (const toy of ['Watering can', 'Boat', 'Wagon']) {
+    if (toy !== 'Watering can') await page.getByRole('button', { name: `Make ${toy}`, exact: true }).click();
+    for (let i = 0; i < 2; i++) {
+      const piece = page.getByRole('button', { name: /^Pick / }).first();
+      await piece.click();
+      await expect(page.locator('#instruction')).toHaveText('Now tap the outlined shape below.');
+      const match = page.locator('.slot.suggested');
+      await expect(match).toHaveCount(1);
+      await match.click();
+    }
+    await expect(page.locator('#zones')).toBeHidden();
+    await expect(page.locator('#remix-content')).toBeHidden();
+    if (toy === 'Watering can') {
+      await page.getByRole('button', { name: 'Water the seeds', exact: true }).click();
+      await expect(page.getByRole('img', { name: 'Your toys in the garden' })).toHaveAttribute('data-flower-owner', 'seedbed');
+    } else {
+      await page.getByRole('button', { name: 'Bring the flower aboard', exact: true }).click();
+      const action = toy === 'Boat' ? 'Sail across the pond' : 'Roll along the path';
+      await page.getByRole('button', { name: action, exact: true }).click();
+      const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('make-play-remix:world:v1')));
+      expect(saved.flower).toBe(toy.toLowerCase());
+      expect(saved.toys[toy.toLowerCase()].position).toBe(toy === 'Boat' ? 'pond-right' : 'rest-right');
+      await page.getByRole('button', { name: action, exact: true }).click();
+    }
+    await page.screenshot({ path: info.outputPath(`simple-${toy.replaceAll(' ', '-')}.png`), fullPage: true });
+    await expect(page.locator('#caregiver')).toBeHidden();
+  }
+  await page.reload();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.getByRole('button', { name: 'Play with Wagon', exact: true }).click();
+  await expect(page.getByRole('img', { name: 'Your toys in the garden' })).toHaveAttribute('data-flower-owner', 'wagon');
+  await expect(page.getByRole('button', { name: 'Roll along the path', exact: true })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+for (const [toy, family, action, destination] of [
+  ['Boat', 'boat', 'Sail across the pond', 'pond-right'],
+  ['Wagon', 'wagon', 'Roll along the path', 'rest-right']
+]) {
+  test(`the ${toy} can be built first and played with using only the keyboard`, async ({ page }) => {
+    await start(page);
+    await page.getByRole('button', { name: `Make ${toy}`, exact: true }).click();
+    for (let i = 0; i < 2; i++) {
+      await page.getByRole('button', { name: /^Pick / }).first().focus();
+      await page.keyboard.press('Enter');
+      await page.locator('.slot.suggested').focus();
+      await page.keyboard.press('Space');
+    }
+    await page.getByRole('button', { name: action, exact: true }).focus();
+    await page.keyboard.press('Enter');
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('make-play-remix:world:v1')));
+    expect(saved.toys[family].position).toBe(destination);
+    expect(saved.flower).toBeNull();
+    await expect(page.locator('#zones')).toBeHidden();
+  });
+}
+
+test('picture-based toy switching preserves an unfinished puzzle', async ({ page }) => {
+  await start(page);
+  await page.getByRole('button', { name: 'Pick Cup', exact: true }).click();
+  await page.getByRole('button', { name: 'Place Cup', exact: true }).click();
+  await page.getByRole('button', { name: 'Make Boat', exact: true }).click();
+  await page.getByRole('button', { name: 'Make Watering can', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Joined Cup', exact: true })).toHaveAttribute('data-filled', 'true');
+  await expect(page.getByRole('button', { name: 'Pick Spout', exact: true })).toBeVisible();
+  await expect(page.locator('#caregiver')).toBeHidden();
+});
+
+test('phone layout keeps the matching task visible without scrolling or shifting after selection', async ({ page }, info) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await start(page);
+  const first = await page.getByRole('button', { name: 'Place Cup', exact: true }).boundingBox();
+  expect(first.y + first.height).toBeLessThanOrEqual(568);
+  await page.getByRole('button', { name: 'Pick Cup', exact: true }).click();
+  const selected = await page.getByRole('button', { name: 'Place Cup', exact: true }).boundingBox();
+  expect(selected.y).toBe(first.y);
+  await page.screenshot({ path: info.outputPath('phone-match.png'), fullPage: true });
+  await page.getByRole('button', { name: 'Place Cup', exact: true }).click();
+  await page.getByRole('button', { name: 'Pick Spout', exact: true }).click();
+  await page.getByRole('button', { name: 'Place Spout', exact: true }).click();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const action = await page.getByRole('button', { name: 'Water the seeds', exact: true }).boundingBox();
+  expect(action.y + action.height).toBeLessThanOrEqual(568);
+  await page.screenshot({ path: info.outputPath('phone-play.png'), fullPage: true });
+});
 
 test('make, play, transport, remix, and restore the same world', async ({ page }, info) => {
   await start(page);
@@ -316,7 +416,7 @@ test('responsive targets remain large and no external requests or console errors
   for (const [width, height] of [[320,568],[568,320],[390,844],[768,1024],[1024,768]]) {
     await page.setViewportSize({ width, height });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    for (const target of await page.locator('[data-source], [data-slot], [data-dest]').all()) {
+    for (const target of await page.locator('[data-source]:visible, [data-slot]:visible, [data-dest]:visible, #play-action:visible, .toy-choice:visible').all()) {
       const box = await target.boundingBox();
       expect(box.width).toBeGreaterThanOrEqual(80);
       expect(box.height).toBeGreaterThanOrEqual(80);

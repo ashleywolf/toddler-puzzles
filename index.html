@@ -88,9 +88,11 @@ p { color: var(--cp-text-muted); line-height: 1.6; }
 #play { min-width: 180px; min-height: 80px; font-size: 28px; }
 .hero-art { width: min(100%, 360px); height: 200px; }
 .eyebrow { text-transform: uppercase; letter-spacing: 0.16em; font-size: 12px; font-weight: 700; color: var(--cp-text-muted); }
-.layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.layout { max-width: 680px; margin: auto; }
 .panel { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 20px; }
 h2 { font-size: 24px; letter-spacing: -0.03em; margin: 4px 0 12px; }
+#toy-title { display: flex; align-items: center; justify-content: space-between; min-height: 64px; margin-bottom: 4px; }
+#toy-title svg { width: 80px; height: 64px; }
 .garden { background: var(--cp-bg-elevated); }
 .zones { display: grid; grid-template-columns: repeat(2, minmax(80px, 1fr)); gap: 12px; }
 .zone { position: relative; min-height: 128px; border: 1px solid var(--cp-border); border-radius: 16px; display: flex; flex-direction: column; align-items: stretch; justify-content: start; gap: 8px; background: var(--cp-accent-soft); padding: 8px; }
@@ -117,13 +119,29 @@ h2 { font-size: 24px; letter-spacing: -0.03em; margin: 4px 0 12px; }
 .tray { display: grid; grid-template-columns: repeat(2, minmax(80px, 1fr)); gap: 12px; }
 .part-label { display: block; font-size: 12px; }
 .work-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.full-toy { width: 100%; height: 140px; }
+.full-toy { width: 100%; height: 180px; }
 .full-toy svg, .preview svg { width: 100%; height: 100%; }
 .remix { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .remix button { min-height: 80px; padding: 12px; flex: 1; }
 .remix button svg { display: block; width: 100%; height: 100px; }
 .preview { width: 100%; height: 100px; }
 #message { min-height: 48px; text-align: center; padding: 12px; font-size: 18px; color: var(--cp-text-muted); }
+.instruction { font-size: 20px; font-weight: 700; line-height: 1.3; min-height: 52px; margin: 8px 0; }
+.step-label { font-size: 16px; font-weight: 600; margin: 12px 0 8px; }
+.piece { border: 2px solid var(--cp-accent); }
+.slot.suggested { border-width: 4px; }
+.action-button { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 112px; font-size: 22px; font-weight: 700; padding: 16px; gap: 8px; }
+.action-pictures { display: flex; align-items: center; gap: 16px; padding: 4px 8px; border-radius: 10px; background: var(--cp-surface); color: var(--cp-text); }
+.action-pictures svg { width: 80px; height: 72px; }
+.action-pictures span { font-size: 32px; }
+.toy-choices { display: grid; grid-template-columns: repeat(2, minmax(80px, 1fr)); gap: 12px; }
+.toy-choice { min-height: 112px; padding: 8px; font-weight: 600; }
+.toy-choice svg { width: 100%; height: 80px; display: block; }
+.scene { width: 100%; height: auto; display: block; margin: 12px 0; border-radius: 16px; background: var(--cp-bg-elevated); }
+details { margin-top: 16px; }
+summary { cursor: pointer; min-height: 48px; padding: 12px; color: var(--cp-text-muted); }
+#remix-panel .remix { margin: 8px 0; }
+#explore .garden { margin-top: 12px; }
 .hint { display: flex; justify-content: center; align-items: center; gap: 12px; }
 .hint svg { width: 56px; height: 56px; }
 dialog { border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text); border-radius: 16px; padding: 24px; width: min(92vw, 480px); max-height: 90dvh; overflow: auto; }
@@ -138,7 +156,7 @@ dialog .wide { width: 100%; }
 #ghost svg { width: 100%; height: 100%; }
 .reaction { animation: nod 400ms ease-out; }
 @keyframes nod { 50% { transform: translateY(-8px); } }
-@media (max-width: 760px) { .layout { grid-template-columns: 1fr; } .layout > [aria-label="Workbench"] { order: -1; } header { padding: 16px; } main { padding: 0 12px 20px; } .panel { padding: 16px; } #welcome { margin-top: 12px; } }
+@media (max-width: 760px) { header { padding: 16px; } main { padding: 0 12px 20px; } .panel { padding: 16px; } #welcome { margin-top: 12px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -148,32 +166,37 @@ dialog .wide { width: 100%; }
   <section id="welcome">
     <svg class="hero-art" viewBox="0 0 360 200" aria-hidden="true"><path d="M15 175 Q90 110 180 175 Q280 115 345 175" fill="var(--cp-accent-soft)" stroke="var(--cp-border-strong)" stroke-width="3"/><path d="M95 160 V85 M95 125 Q65 90 55 120 M95 135 Q120 90 135 125" fill="var(--cp-success)" stroke="var(--cp-success)" stroke-width="5"/><circle cx="95" cy="70" r="30" fill="var(--cp-accent)"/><circle cx="95" cy="70" r="12" fill="var(--cp-warning)"/><path d="M200 130 H320 L295 165 H225Z" fill="var(--cp-accent)"/><path d="M255 130 V40 L305 115 H255" fill="var(--cp-warning)" stroke="var(--cp-text)" stroke-width="3"/><path d="M190 180 Q220 165 250 180 T330 180" fill="none" stroke="var(--cp-link)" stroke-width="5"/></svg>
     <div class="eyebrow">A little world made by you</div>
-    <h1>Small hands.<br>Wonderful ideas.</h1>
-    <p>Make a toy. See what it can do.<br>Then try something wonderfully different.</p>
+    <h1>Let's grow<br>a little flower.</h1>
+    <p>First, put a watering can together.<br>Then tap it to water the seeds.</p>
     <button id="play" class="primary">Play</button>
     <p>No rush. No scores. Just a garden to explore.</p>
   </section>
   <section id="game" hidden>
     <div class="layout">
-      <section class="panel garden" aria-label="Your garden">
-        <div class="eyebrow">Play</div><h2>Your little garden</h2>
-        <div id="zones" class="zones"></div>
-        <div id="toys" class="toys"></div>
-      </section>
       <section class="panel" aria-label="Workbench">
-        <div class="work-header"><div><div class="eyebrow">Make & remix</div><h2 id="toy-title"></h2></div><button id="other-toy" class="small" aria-label="Choose another toy">Other toys</button></div>
+        <div class="eyebrow" id="stage-label">Let's make</div>
+        <h2 id="toy-title" tabindex="-1"></h2>
+        <div id="instruction" class="instruction" aria-live="polite"></div>
         <div id="work"></div>
-        <div class="hint" aria-hidden="true"><svg viewBox="0 0 80 80"><circle cx="20" cy="40" r="13" fill="var(--cp-accent)"/><path d="M40 40 H68 M55 28 L68 40 L55 52" stroke="var(--cp-text-muted)" stroke-width="4" fill="none"/></svg><span id="hint-text">Pick a piece. Find its shape.</span></div>
+        <div id="choices"></div>
+        <details id="remix-panel" hidden><summary>Try a different look</summary><div id="remix-content"></div></details>
+        <details id="explore" hidden>
+          <summary>Explore the garden yourself</summary>
+          <section class="panel garden" aria-label="Your garden">
+            <p>Tap a toy, then a highlighted place. Or drag it there.</p>
+            <div id="zones" class="zones"></div>
+          </section>
+        </details>
       </section>
     </div>
-    <div id="message" role="status" aria-live="polite">Tap a piece, then its place. Dragging works too.</div>
+    <div id="message" role="status" aria-live="polite"></div>
   </section>
 </main>
 <dialog id="caregiver" aria-labelledby="caregiver-title">
   <h2 id="caregiver-title">A moment for grown-ups</h2>
   <div id="gate"><p>Garden settings are here. Nothing changes just by opening them.</p><button id="open-settings" class="primary wide">Open garden settings</button><button class="wide close-dialog">Back to play</button></div>
   <div id="settings" hidden>
-    <label>Toy on the workbench<select id="family"><option value="can">Watering can</option><option value="boat">Little boat</option><option value="wagon">Garden wagon</option></select></label>
+    <label>Toy on the workbench<select id="family"><option value="can">Watering can</option><option value="boat">Boat</option><option value="wagon">Wagon</option></select></label>
     <label>Pieces<select id="count"><option value="2">2 - a little beginning</option><option value="3">3 - a little more</option><option value="4">4 - more pieces to join</option></select></label>
     <button id="sound" class="wide">Enable gentle sounds</button><p id="audio-status" class="status">Sound is off. Everything works silently.</p>
     <p id="save-status" class="status">Creations stay on this device.</p>
@@ -190,7 +213,7 @@ dialog .wide { width: 100%; }
 'use strict';
 const $ = selector => document.querySelector(selector);
 const families = ['can', 'boat', 'wagon'];
-const names = { can: 'Watering can', boat: 'Little boat', wagon: 'Garden wagon' };
+const names = { can: 'Watering can', boat: 'Boat', wagon: 'Wagon' };
 const locations = ['seedbed', 'pond-left', 'pond-right', 'rest-left', 'rest-right'];
 const labels = { seedbed: 'Water the seeds', 'pond-left': 'This side of the pond', 'pond-right': 'Across the pond', 'rest-left': 'Garden path', 'rest-right': 'Under the tree' };
 const key = 'make-play-remix:world:v1';
@@ -306,6 +329,44 @@ function audioFailure(error) {
   console.warn('Garden audio failed:', error);
 }
 function currentParts() { return world.builds[family][count]; }
+function sceneArt() {
+  const points = { seedbed: [70, 110], 'pond-left': [335, 120], 'pond-right': [470, 120], 'rest-left': [110, 210], 'rest-right': [425, 210] };
+  const inset = (picture, x, y, width = 96, height = 80) => picture.replace('<svg viewBox', `<svg x="${x}" y="${y}" width="${width}" height="${height}" viewBox`);
+  const toys = families.filter(f => world.toys[f]).map(f => {
+    const [x, y] = points[world.toys[f].position];
+    return inset(toyArt(f, world.toys[f].look), x, y);
+  }).join('');
+  let flower = '';
+  if (world.flower) {
+    const [x, y] = world.flower === 'seedbed' ? [105, 110] : points[world.toys[world.flower].position];
+    flower = inset(flowerArt, x + 28, y - 35, 50, 60);
+  }
+  return `<svg class="scene" viewBox="0 0 600 310" role="img" aria-label="Your toys in the garden" data-flower-owner="${world.flower || 'none'}">
+    <path d="M0 170 Q150 120 300 175 T600 150 V310 H0Z" fill="var(--cp-success)" opacity=".12"/>
+    <path d="M0 265 Q140 185 280 270 T600 230" stroke="var(--cp-warning)" stroke-width="28" opacity=".25" fill="none"/>
+    <ellipse cx="435" cy="185" rx="150" ry="50" fill="var(--cp-link)" opacity=".18"/>
+    <path d="M320 195 Q350 182 380 195 T440 195 M455 170 Q480 158 510 170 T565 170" stroke="var(--cp-link)" stroke-width="4" fill="none"/>
+    <path d="M80 180 Q115 140 165 180" fill="var(--cp-warning)" opacity=".6"/>
+    <path d="M108 162 V139 M135 162 V145" stroke="var(--cp-success)" stroke-width="5"/>
+    <path d="M530 115 V35" stroke="var(--cp-text-muted)" stroke-width="8"/><path d="M530 18 Q480-5 477 46 Q493 78 531 53 Q576 80 579 38 Q565-7 530 18" fill="var(--cp-success)" opacity=".7"/>
+    ${toys}${flower}
+  </svg>`;
+}
+function playAction() {
+  if (family === 'can') return { source: 'toy:can', destination: 'seedbed', text: world.flower ? 'Water the seeds again' : 'Water the seeds', picture: zoneArt.seedbed };
+  if (world.flower && world.flower !== family) return { source: 'flower', destination: `carrier:${family}`, text: 'Bring the flower aboard', picture: flowerArt };
+  const position = world.toys[family].position;
+  return family === 'boat'
+    ? { source: 'toy:boat', destination: position === 'pond-left' ? 'pond-right' : 'pond-left', text: 'Sail across the pond', picture: zoneArt.pond }
+    : { source: 'toy:wagon', destination: position === 'rest-left' ? 'rest-right' : 'rest-left', text: 'Roll along the path', picture: zoneArt.rest };
+}
+function changeToy(next) {
+  cancelDrag(); selection = null; preview = null; family = next;
+  $('#explore').open = false; $('#remix-panel').open = false;
+  say(''); render();
+  $('#toy-title').focus({ preventScroll: true });
+  $('#toy-title').scrollIntoView({ block: 'nearest' });
+}
 function renderToy(f) {
   const toy = world.toys[f];
   return `<div class="toy-wrap" data-location="${toy.position}">
@@ -318,7 +379,6 @@ function render() {
   const focusSource = focusBefore?.dataset.source;
   const focusDest = focusBefore?.dataset.dest;
   const focusId = focusBefore?.id;
-  $('#toy-title').textContent = names[family];
   const order = ['seedbed', 'pond-left', 'rest-left', 'pond-right', 'rest-right'];
   $('#zones').innerHTML = order.map(position => {
     const picture = position === 'seedbed' ? zoneArt.seedbed : position.startsWith('pond') ? zoneArt.pond : zoneArt.rest;
@@ -328,18 +388,31 @@ function render() {
       ${families.filter(f => world.toys[f]?.position === position).map(renderToy).join('')}
     </div>`;
   }).join('');
-  $('#toys').innerHTML = '';
-  if (currentParts().length === count) {
-    $('#work').innerHTML = `<div class="full-toy">${toyArt(family, world.toys[family].look)}</div><p>Your toy is ready. Take it into the garden.</p>
-      <div class="remix"><button id="preview-look" aria-label="Preview a new look">${toyArt(family, 1 - world.toys[family].look)}Try a new look</button></div>
+  const complete = currentParts().length === count;
+  const joined = svg(art[family].map((piece, i) => `<g opacity="${currentParts().some(p => groups(count)[p].includes(i)) ? 1 : 0.16}">${piece}</g>`).join(''));
+  $('#toy-title').innerHTML = `${names[family]}<span aria-hidden="true">${complete ? toyArt(family, world.toys[family].look) : joined}</span>`;
+  $('#stage-label').textContent = complete ? "Let's play" : "Let's make";
+  $('#explore').hidden = !complete;
+  $('#remix-panel').hidden = !complete;
+  if (complete) {
+    const action = playAction();
+    $('#instruction').textContent = action.text === 'Bring the flower aboard' ? 'Your toy is ready. Bring the flower!' : 'Your toy is ready. Tap the big button!';
+    const toy = toyArt(family, world.toys[family].look);
+    $('#work').innerHTML = `${sceneArt()}<button class="action-button primary" id="play-action" data-action-source="${action.source}" data-action-dest="${action.destination}"><span class="action-pictures" aria-hidden="true">${action.source === 'flower' ? flowerArt : toy}<span>&rarr;</span>${action.source === 'flower' ? toy : action.picture}</span>${action.text}</button>`;
+    $('#remix-content').innerHTML = `<div class="remix"><button id="preview-look" aria-label="Preview a new look">${toyArt(family, 1 - world.toys[family].look)}Try a new look</button></div>
       ${preview !== null ? `<div class="preview">${toyArt(family, preview)}</div><div class="remix"><button id="apply-look" class="primary">Use this look</button><button id="cancel-look">Keep this look</button></div>` : ''}`;
   } else {
     const parts = currentParts();
     const available = groups(count).map((_, i) => i).filter(i => !parts.includes(i)).slice(0, 2);
-    $('#work').innerHTML = `<div class="assembly">${groups(count).map((_, i) => `<button class="slot" data-slot="${i}" data-dest="slot:${i}" data-filled="${parts.includes(i)}" aria-label="${parts.includes(i) ? 'Joined' : 'Place'} ${partNames[family][groups(count)[i][0]]}">${partArt(family, count, i)}</button>`).join('')}</div>
-      <div class="tray">${available.map(i => `<button class="piece" data-source="part:${i}" aria-label="Pick ${partNames[family][groups(count)[i][0]]}">${partArt(family, count, i)}<span class="part-label">${partNames[family][groups(count)[i][0]]}</span></button>`).join('')}</div>`;
+    $('#instruction').textContent = 'Tap a piece below to start.';
+    $('#work').innerHTML = `<div class="step-label">1. Tap one of these pieces</div>
+      <div class="tray">${available.map(i => `<button class="piece" data-source="part:${i}" aria-label="Pick ${partNames[family][groups(count)[i][0]]}">${partArt(family, count, i)}<span class="part-label">${partNames[family][groups(count)[i][0]]}</span></button>`).join('')}</div>
+      <div class="step-label" id="place-instruction">2. Then tap its matching shape here</div>
+      <div class="assembly">${groups(count).map((_, i) => `<button class="slot" data-slot="${i}" data-dest="slot:${i}" data-filled="${parts.includes(i)}" aria-label="${parts.includes(i) ? 'Joined' : 'Place'} ${partNames[family][groups(count)[i][0]]}">${partArt(family, count, i)}</button>`).join('')}</div>`;
+    $('#remix-content').innerHTML = '';
   }
-  $('#hint-text').textContent = currentParts().length === count ? 'Pick a toy. Choose a place.' : 'Pick a piece. Find its shape.';
+  const others = families.filter(f => f !== family);
+  $('#choices').innerHTML = `<div class="step-label">Or choose another toy</div><div class="toy-choices">${others.map(f => `<button class="toy-choice" data-family="${f}" aria-label="${world.builds[f][count].length === count ? 'Play with' : 'Make'} ${names[f]}">${toyArt(f, world.toys[f]?.look || 0)}${world.builds[f][count].length === count ? 'Play with' : 'Make'} ${names[f]}</button>`).join('')}</div>`;
   markSelection();
   const replacement = focusSource ? document.querySelector(`[data-source="${focusSource}"]`)
     : focusDest ? document.querySelector(`[data-dest="${focusDest}"]`)
@@ -357,6 +430,13 @@ function markSelection() {
       : selection === 'flower' ? destination === 'seedbed' || destination.startsWith('carrier:') : false;
     element.classList.toggle('suggested', matches);
   });
+  if (selection?.startsWith('part:')) {
+    $('#instruction').textContent = 'Now tap the outlined shape below.';
+    $('#place-instruction').textContent = '2. Tap the shape with the thick outline';
+  } else if (currentParts().length !== count) {
+    $('#instruction').textContent = 'Tap a piece below to start.';
+    $('#place-instruction').textContent = '2. Then tap its matching shape here';
+  }
 }
 function commit(source, destination) {
   let changed = false;
@@ -387,7 +467,11 @@ function commit(source, destination) {
       say('Your flower is coming along.'); changed = true;
     }
   }
-  if (changed) { selection = null; save(); render(); chime(); $('#zones').classList.remove('reaction'); void $('#zones').offsetWidth; $('#zones').classList.add('reaction'); }
+  if (changed) {
+    selection = null; save(); render(); chime();
+    const scene = $('.scene') || $('#zones');
+    scene.classList.remove('reaction'); void scene.offsetWidth; scene.classList.add('reaction');
+  }
   else { say('Try another place. Your garden is still here.'); markSelection(); }
   return changed;
 }
@@ -399,7 +483,7 @@ function cancelDrag() {
   drag = null; $('#ghost').hidden = true;
 }
 function destinationAt(x, y) {
-  const candidates = [...document.querySelectorAll('[data-dest]')].map(element => {
+  const candidates = [...document.querySelectorAll('[data-dest]')].filter(element => element.getClientRects().length).map(element => {
     const r = element.getBoundingClientRect();
     const inside = x >= r.left - 12 && x <= r.right + 12 && y >= r.top - 12 && y <= r.bottom + 12;
     return { element, inside, distance: Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2)) };
@@ -436,6 +520,10 @@ $('#game').addEventListener('lostpointercapture', event => { if (event.pointerId
 window.addEventListener('resize', cancelDrag);
 $('#game').addEventListener('click', event => {
   if (suppressClick) return;
+  const chosen = event.target.closest('[data-family]');
+  if (chosen) { changeToy(chosen.dataset.family); return; }
+  const action = event.target.closest('#play-action');
+  if (action) { commit(action.dataset.actionSource, action.dataset.actionDest); return; }
   const source = event.target.closest('[data-source]'), destination = event.target.closest('[data-dest]');
   if (destination && selection && (!source || selection === 'flower' || destination.dataset.dest === 'seedbed')) commit(selection, destination.dataset.dest);
   else if (source) { selection = source.dataset.source === selection ? null : source.dataset.source; markSelection(); say('Now choose its place.'); }
@@ -451,7 +539,6 @@ function openParents() {
   $('#caregiver').showModal();
 }
 $('#parents').addEventListener('click', openParents);
-$('#other-toy').addEventListener('click', openParents);
 $('#open-settings').addEventListener('click', () => { $('#gate').hidden = true; $('#settings').hidden = false; $('#family').focus(); });
 document.querySelectorAll('.close-dialog').forEach(button => button.addEventListener('click', () => {
   if (!$('#settings').hidden) { family = $('#family').value; count = Number($('#count').value); render(); }

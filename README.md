@@ -8,16 +8,21 @@ in your garden instead of disappearing after a puzzle.
 
 ## Playing together
 
-Tap a piece, then its matching outline, or drag it there. Completed toys
-appear in the garden. Select a toy, then a large garden destination:
-watering cans water seeds, boats move between pond shores, and wagons move
-along the path. Select a grown flower, then a boat or wagon
-to carry it. Select it again to transfer it to another toy or the seedbed.
+Start with the watering can. Tap a piece, then the matching shape with
+the thick outline, or drag the piece there. A small picture shows the
+whole toy coming together. The garden stays out of the way while building.
 
-Grown-ups -> Open garden settings selects another toy or 2, 3, or 4 pieces.
+When the toy is ready, one big picture button shows what to do: water the
+seeds, bring the flower aboard, sail across the pond, or roll along the path.
+Each action needs just one tap. The shared garden shows the result.
+Choose another toy using the two picture buttons below; settings are not needed.
+
 There are no paid or earned unlocks. The workbench shows at most two loose
-pieces at once. Try a new look previews a reversible alternative; Use this
-look applies it without losing position or cargo.
+pieces at once. **Try a different look** opens reversible part remixes.
+**Explore the garden yourself** optionally opens the original drag/tap play:
+select a toy or flower, then a highlighted destination. Neither panel is
+needed for the main play loop. Grown-ups -> Open garden settings changes
+the number of pieces to 2, 3, or 4 and also offers a toy selector.
 
 Sound starts off each visit. Grown-ups can enable gentle sounds or mute all
 of them. Silent play is fully supported. Reset requires adult confirmation;
@@ -58,7 +63,8 @@ npm test
 npm run test:report
 ```
 
-Browser E2E tests cover construction, connected play, remixes, persistence,
+Browser E2E tests cover the visible, settings-free play loop, compact phone
+layouts, construction, connected play, remixes, persistence,
 input cancellation, offline loading, and responsive targets. Screenshots and
 an HTML report are generated in ignored test-output directories.
 Chromium and emulated iPad WebKit coverage do not replace physical device

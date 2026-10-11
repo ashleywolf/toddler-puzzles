@@ -1,5 +1,5 @@
 'use strict';
-const CACHE = 'make-play-remix:shell:v1';
+const CACHE = 'make-play-remix:shell:v2';
 const PREFIX = 'make-play-remix:shell:';
 const root = new URL('./', self.location.href);
 const files = ['index.html', 'manifest.webmanifest', 'icon.svg'];
