@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Make, Play, Remix</title>
+<script>
+  (() => {
+    const param = new URLSearchParams(window.location.search).get("scoutTheme");
+    const theme =
+      param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--cp-bg); color: var(--cp-text); font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; }
+button, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 1px solid var(--cp-border); background: var(--cp-surface); border-radius: 0.625rem; }
+button:hover { background: var(--cp-bg-elevated); }
+button:focus-visible, select:focus-visible { outline: 3px solid var(--cp-accent); outline-offset: 4px; }
+button[aria-pressed="true"] { outline: 3px solid var(--cp-accent); background: var(--cp-highlight); }
+.suggested { border-color: var(--cp-accent); border-style: solid; box-shadow: inset 0 0 0 2px var(--cp-accent); }
+[hidden] { display: none !important; }
+header { max-width: 1120px; margin: auto; padding: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand { font-weight: 700; letter-spacing: -0.04em; font-size: clamp(20px, 4vw, 28px); }
+.small { padding: 12px 16px; min-height: 48px; }
+main { max-width: 1120px; margin: auto; padding: 0 20px 24px; }
+#welcome { max-width: 720px; text-align: center; margin: 32px auto; }
+#welcome h1 { font-size: clamp(40px, 8vw, 76px); line-height: 1.05; letter-spacing: -0.06em; margin: 24px 0; }
+p { color: var(--cp-text-muted); line-height: 1.6; }
+.primary { background: var(--cp-accent); color: var(--cp-accent-fg); border-color: var(--cp-accent); }
+.primary:hover { background: var(--cp-accent-hover); }
+#play { min-width: 180px; min-height: 80px; font-size: 28px; }
+.hero-art { width: min(100%, 360px); height: 200px; }
+.eyebrow { text-transform: uppercase; letter-spacing: 0.16em; font-size: 12px; font-weight: 700; color: var(--cp-text-muted); }
+.layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.panel { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 20px; }
+h2 { font-size: 24px; letter-spacing: -0.03em; margin: 4px 0 12px; }
+.garden { background: var(--cp-bg-elevated); }
+.zones { display: grid; grid-template-columns: repeat(2, minmax(80px, 1fr)); gap: 12px; }
+.zone { position: relative; min-height: 128px; border: 1px solid var(--cp-border); border-radius: 16px; display: flex; flex-direction: column; align-items: stretch; justify-content: start; gap: 8px; background: var(--cp-accent-soft); padding: 8px; }
+.destination { width: 100%; min-width: 80px; min-height: 112px; border-style: dashed; background: var(--cp-bg-elevated); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.destination svg { width: 80px; height: 80px; }
+.zone > .flower { align-self: center; }
+.zone-label { font-size: 12px; color: var(--cp-text-muted); }
+.toys { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.toy-wrap { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 100px; }
+.piece, .toy, .flower, .slot { min-width: 80px; min-height: 80px; touch-action: none; padding: 8px; }
+.piece svg, .toy svg, .flower svg, .slot svg { width: 100%; height: 80px; display: block; }
+.toy { min-height: 112px; }
+.toy-wrap[data-location="seedbed"] { border-bottom: 4px solid var(--cp-success); border-radius: 10px; }
+.toy-wrap[data-location="pond-left"], .toy-wrap[data-location="pond-right"] { border-bottom: 4px solid var(--cp-link); border-radius: 10px; }
+.location { font-size: 12px; text-align: center; color: var(--cp-text-muted); }
+.cargo { min-width: 80px; min-height: 80px; width: 100%; padding: 8px; border-style: dashed; }
+.cargo svg { width: 64px; height: 64px; }
+.flower svg { width: 80px; height: 80px; }
+.assembly { display: grid; grid-template-columns: repeat(2, minmax(80px, 1fr)); gap: 12px; margin: 16px 0; }
+.slot { border: 2px dashed var(--cp-border-strong); }
+.slot svg { opacity: 0.3; }
+.slot[data-filled="true"] { border-style: solid; border-color: var(--cp-success); }
+.slot[data-filled="true"] svg { opacity: 1; }
+.tray { display: grid; grid-template-columns: repeat(2, minmax(80px, 1fr)); gap: 12px; }
+.part-label { display: block; font-size: 12px; }
+.work-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.full-toy { width: 100%; height: 140px; }
+.full-toy svg, .preview svg { width: 100%; height: 100%; }
+.remix { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.remix button { min-height: 80px; padding: 12px; flex: 1; }
+.remix button svg { display: block; width: 100%; height: 100px; }
+.preview { width: 100%; height: 100px; }
+#message { min-height: 48px; text-align: center; padding: 12px; font-size: 18px; color: var(--cp-text-muted); }
+.hint { display: flex; justify-content: center; align-items: center; gap: 12px; }
+.hint svg { width: 56px; height: 56px; }
+dialog { border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text); border-radius: 16px; padding: 24px; width: min(92vw, 480px); max-height: 90dvh; overflow: auto; }
+dialog::backdrop { background: var(--cp-overlay); }
+dialog label { display: block; margin: 16px 0; }
+select { display: block; width: 100%; padding: 12px; margin-top: 8px; background: var(--cp-surface-soft); border: 1px solid var(--cp-border-strong); border-radius: 10px; }
+dialog button { min-height: 48px; padding: 12px; margin: 4px 0; }
+dialog .wide { width: 100%; }
+.status { font-size: 13px; margin: 8px 0; color: var(--cp-text-muted); }
+.dragging { opacity: 0.5; }
+#ghost { position: fixed; width: 96px; height: 96px; pointer-events: none; z-index: 5; background: var(--cp-panel); border: 2px solid var(--cp-accent); border-radius: 10px; }
+#ghost svg { width: 100%; height: 100%; }
+.reaction { animation: nod 400ms ease-out; }
+@keyframes nod { 50% { transform: translateY(-8px); } }
+@media (max-width: 760px) { .layout { grid-template-columns: 1fr; } .layout > [aria-label="Workbench"] { order: -1; } header { padding: 16px; } main { padding: 0 12px 20px; } .panel { padding: 16px; } #welcome { margin-top: 12px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header><span class="brand">Make, Play, Remix</span><button id="parents" class="small">Grown-ups</button></header>
+<main>
+  <section id="welcome">
+    <svg class="hero-art" viewBox="0 0 360 200" aria-hidden="true"><path d="M15 175 Q90 110 180 175 Q280 115 345 175" fill="var(--cp-accent-soft)" stroke="var(--cp-border-strong)" stroke-width="3"/><path d="M95 160 V85 M95 125 Q65 90 55 120 M95 135 Q120 90 135 125" fill="var(--cp-success)" stroke="var(--cp-success)" stroke-width="5"/><circle cx="95" cy="70" r="30" fill="var(--cp-accent)"/><circle cx="95" cy="70" r="12" fill="var(--cp-warning)"/><path d="M200 130 H320 L295 165 H225Z" fill="var(--cp-accent)"/><path d="M255 130 V40 L305 115 H255" fill="var(--cp-warning)" stroke="var(--cp-text)" stroke-width="3"/><path d="M190 180 Q220 165 250 180 T330 180" fill="none" stroke="var(--cp-link)" stroke-width="5"/></svg>
+    <div class="eyebrow">A little world made by you</div>
+    <h1>Small hands.<br>Wonderful ideas.</h1>
+    <p>Make a toy. See what it can do.<br>Then try something wonderfully different.</p>
+    <button id="play" class="primary">Play</button>
+    <p>No rush. No scores. Just a garden to explore.</p>
+  </section>
+  <section id="game" hidden>
+    <div class="layout">
+      <section class="panel garden" aria-label="Your garden">
+        <div class="eyebrow">Play</div><h2>Your little garden</h2>
+        <div id="zones" class="zones"></div>
+        <div id="toys" class="toys"></div>
+      </section>
+      <section class="panel" aria-label="Workbench">
+        <div class="work-header"><div><div class="eyebrow">Make & remix</div><h2 id="toy-title"></h2></div><button id="other-toy" class="small" aria-label="Choose another toy">Other toys</button></div>
+        <div id="work"></div>
+        <div class="hint" aria-hidden="true"><svg viewBox="0 0 80 80"><circle cx="20" cy="40" r="13" fill="var(--cp-accent)"/><path d="M40 40 H68 M55 28 L68 40 L55 52" stroke="var(--cp-text-muted)" stroke-width="4" fill="none"/></svg><span id="hint-text">Pick a piece. Find its shape.</span></div>
+      </section>
+    </div>
+    <div id="message" role="status" aria-live="polite">Tap a piece, then its place. Dragging works too.</div>
+  </section>
+</main>
+<dialog id="caregiver" aria-labelledby="caregiver-title">
+  <h2 id="caregiver-title">A moment for grown-ups</h2>
+  <div id="gate"><p>Garden settings are here. Nothing changes just by opening them.</p><button id="open-settings" class="primary wide">Open garden settings</button><button class="wide close-dialog">Back to play</button></div>
+  <div id="settings" hidden>
+    <label>Toy on the workbench<select id="family"><option value="can">Watering can</option><option value="boat">Little boat</option><option value="wagon">Garden wagon</option></select></label>
+    <label>Pieces<select id="count"><option value="2">2 - a little beginning</option><option value="3">3 - a little more</option><option value="4">4 - more pieces to join</option></select></label>
+    <button id="sound" class="wide">Enable gentle sounds</button><p id="audio-status" class="status">Sound is off. Everything works silently.</p>
+    <p id="save-status" class="status">Creations stay on this device.</p>
+    <p id="offline-status" class="status">Preparing offline play...</p>
+    <button id="update" class="wide" hidden>Save and update the game</button>
+    <button id="reset" class="wide">Reset this garden</button>
+    <div id="reset-confirm" hidden><p>This removes this game's saved creations only.</p><button id="reset-yes" class="wide">Yes, start a fresh garden</button><button id="reset-no" class="wide">Keep my garden</button></div>
+    <button class="primary wide close-dialog">Back to the garden</button>
+    <p class="status">Free. No ads, accounts, tracking, or uploads. Offline play needs a successful first visit. Clearing browser storage can remove creations and offline access.</p>
+  </div>
+</dialog>
+<div id="ghost" hidden></div>
+<script>
+'use strict';
+const $ = selector => document.querySelector(selector);
+const families = ['can', 'boat', 'wagon'];
+const names = { can: 'Watering can', boat: 'Little boat', wagon: 'Garden wagon' };
+const locations = ['seedbed', 'pond-left', 'pond-right', 'rest-left', 'rest-right'];
+const labels = { seedbed: 'Water the seeds', 'pond-left': 'This side of the pond', 'pond-right': 'Across the pond', 'rest-left': 'Garden path', 'rest-right': 'Under the tree' };
+const key = 'make-play-remix:world:v1';
+const svg = body => `<svg viewBox="0 0 120 100" aria-hidden="true">${body}</svg>`;
+const art = {
+  can: [
+    '<path d="M25 40 H77 V83 Q50 94 25 83Z" fill="var(--cp-accent)" stroke="var(--cp-text)" stroke-width="3"/>',
+    '<path d="M76 53 L106 24 L114 34 L80 73Z" fill="var(--cp-warning)" stroke="var(--cp-text)" stroke-width="3"/>',
+    '<path d="M27 45 C-2 0 76 0 72 43" fill="none" stroke="var(--cp-text)" stroke-width="8"/>',
+    '<path d="M99 22 L117 33" stroke="var(--cp-link)" stroke-width="8"/><path d="M43 56 Q56 44 64 58 Q54 75 43 56" fill="var(--cp-accent-fg)"/>'
+  ],
+  boat: [
+    '<path d="M10 66 H110 L89 90 H33Z" fill="var(--cp-accent)" stroke="var(--cp-text)" stroke-width="3"/>',
+    '<path d="M59 64 V8 L99 60 H59Z" fill="var(--cp-warning)" stroke="var(--cp-text)" stroke-width="3"/>',
+    '<path d="M53 20 L23 59 H53Z" fill="var(--cp-link)" stroke="var(--cp-text)" stroke-width="3"/>',
+    '<path d="M57 65 V5 M58 8 H80 L68 23 H58" fill="var(--cp-success)" stroke="var(--cp-text)" stroke-width="3"/>'
+  ],
+  wagon: [
+    '<path d="M18 30 H96 V66 H18Z" fill="var(--cp-accent)" stroke="var(--cp-text)" stroke-width="3"/>',
+    '<circle cx="32" cy="77" r="13" fill="var(--cp-warning)" stroke="var(--cp-text)" stroke-width="4"/>',
+    '<circle cx="83" cy="77" r="13" fill="var(--cp-link)" stroke="var(--cp-text)" stroke-width="4"/>',
+    '<path d="M96 47 L113 13 H102" fill="none" stroke="var(--cp-text)" stroke-width="5"/>'
+  ]
+};
+const partNames = {
+  can: ['Cup', 'Spout', 'Handle', 'Sprinkler'],
+  boat: ['Hull', 'Big sail', 'Little sail', 'Flag'],
+  wagon: ['Basket', 'Front wheel', 'Back wheel', 'Handle']
+};
+const groups = count => count === 2 ? [[0, 2], [1, 3]] : count === 3 ? [[0], [1, 3], [2]] : [[0], [1], [2], [3]];
+const partArt = (family, count, index) => svg(groups(count)[index].map(i => art[family][i]).join(''));
+const alternateParts = {
+  can: '<path d="M99 17 Q119 12 116 36 L96 31Z" fill="var(--cp-link)" stroke="var(--cp-text)" stroke-width="3"/><path d="M39 64 Q51 42 66 64" fill="none" stroke="var(--cp-accent-fg)" stroke-width="4"/>',
+  boat: '<path d="M57 65 V5 M58 8 Q87-4 87 19 Q75 30 58 22" fill="var(--cp-success)" stroke="var(--cp-text)" stroke-width="3"/>',
+  wagon: '<path d="M96 47 L113 13 H102" fill="none" stroke="var(--cp-text)" stroke-width="5"/><path d="M16 30 Q57-9 98 30Z" fill="var(--cp-success)" stroke="var(--cp-text)" stroke-width="3"/>'
+};
+const toyArt = (family, look = 0) => svg(art[family].slice(0, 3).join('') + (look ? alternateParts[family] : art[family][3]));
+const flowerArt = svg('<path d="M60 85 V42 M60 68 Q23 46 30 72 Q45 84 60 68 M60 61 Q96 39 90 66 Q77 80 60 61" fill="var(--cp-success)" stroke="var(--cp-success)" stroke-width="4"/><path d="M60 42 C10 36 34 5 59 25 C70-6 104 15 78 35 C107 52 76 76 60 42" fill="var(--cp-accent)"/><circle cx="62" cy="37" r="10" fill="var(--cp-warning)"/>');
+const zoneArt = {
+  seedbed: svg('<path d="M12 75 Q60 40 108 75" fill="var(--cp-warning)"/><path d="M40 67 V37 M80 67 V45" stroke="var(--cp-success)" stroke-width="5"/><path d="M40 50 Q10 25 22 47 M80 55 Q103 26 108 51" fill="var(--cp-success)"/>'),
+  pond: svg('<ellipse cx="60" cy="58" rx="52" ry="25" fill="var(--cp-link)" opacity=".2"/><path d="M15 50 Q32 38 49 50 T100 50 M25 65 Q42 53 59 65 T95 65" stroke="var(--cp-link)" stroke-width="4" fill="none"/>'),
+  rest: svg('<path d="M10 82 Q60 45 110 82" fill="var(--cp-accent-soft)"/><path d="M64 82 V30" stroke="var(--cp-text-muted)" stroke-width="7"/><path d="M64 12 Q20 20 33 53 Q54 67 86 48 Q100 16 64 12" fill="var(--cp-success)" opacity=".7"/>')
+};
+function fresh() {
+  return { version: 1, builds: Object.fromEntries(families.map(f => [f, { 2: [], 3: [], 4: [] }])), toys: {}, flower: null };
+}
+function valid(data) {
+  if (!data || data.version !== 1 || !data.builds || !data.toys) return false;
+  for (const f of families) {
+    for (const n of [2, 3, 4]) {
+      const parts = data.builds[f]?.[n];
+      if (!Array.isArray(parts) || new Set(parts).size !== parts.length || parts.some(i => !Number.isInteger(i) || i < 0 || i >= n)) return false;
+    }
+    const toy = data.toys[f];
+    const completed = [2, 3, 4].some(n => data.builds[f][n].length === n);
+    if (completed !== Boolean(toy)) return false;
+    if (toy && (!locations.includes(toy.position) || ![0, 1].includes(toy.look))) return false;
+    if (toy && f === 'boat' && !toy.position.startsWith('pond-')) return false;
+    if (toy && f === 'wagon' && !toy.position.startsWith('rest-')) return false;
+    if (toy && f === 'can' && toy.position !== 'seedbed' && !toy.position.startsWith('rest-')) return false;
+  }
+  if (Object.keys(data.toys).some(f => !families.includes(f))) return false;
+  return data.flower === null || data.flower === 'seedbed' || (['boat', 'wagon'].includes(data.flower) && Boolean(data.toys[data.flower]));
+}
+let world = fresh(), family = 'can', count = 2, selection = null, drag = null, preview = null;
+let sound = false, audio = null, waitingWorker = null, suppressClick = false;
+const tones = new Set();
+let saveProblem = false;
+try {
+  const stored = localStorage.getItem(key);
+  if (stored) {
+    const data = JSON.parse(stored);
+    if (!valid(data)) throw new Error('Saved garden format is not supported');
+    world = data;
+  }
+} catch (error) {
+  saveProblem = true;
+  $('#save-status').textContent = 'Your saved garden could not be restored. You can play here; reset to start fresh.';
+  console.warn('Garden restore failed:', error);
+}
+function save() {
+  if (saveProblem) return false;
+  try {
+    localStorage.setItem(key, JSON.stringify(world));
+    $('#save-status').textContent = 'Creations saved on this device.';
+    return true;
+  } catch (error) {
+    $('#save-status').textContent = 'Creations could not be saved. This garden works until you close the page.';
+    console.warn('Garden save failed:', error);
+    return false;
+  }
+}
+function say(text) { $('#message').textContent = text; }
+function chime() {
+  if (!sound || !audio) return;
+  try {
+    const oscillator = audio.createOscillator(), gain = audio.createGain();
+    oscillator.type = 'sine'; oscillator.frequency.value = 440;
+    gain.gain.setValueAtTime(0.04, audio.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.25);
+    oscillator.connect(gain); gain.connect(audio.destination);
+    tones.add(oscillator);
+    oscillator.onended = () => { tones.delete(oscillator); oscillator.disconnect(); gain.disconnect(); };
+    oscillator.start(); oscillator.stop(audio.currentTime + 0.25);
+  } catch (error) { audioFailure(error); }
+}
+function audioFailure(error) {
+  sound = false;
+  for (const tone of tones) tone.stop();
+  tones.clear();
+  $('#sound').textContent = 'Enable gentle sounds';
+  $('#audio-status').textContent = 'Sound is unavailable. The garden still works silently.';
+  console.warn('Garden audio failed:', error);
+}
+function currentParts() { return world.builds[family][count]; }
+function renderToy(f) {
+  const toy = world.toys[f];
+  return `<div class="toy-wrap" data-location="${toy.position}">
+      <button class="toy" data-source="toy:${f}" ${f !== 'can' ? `data-dest="carrier:${f}"` : ''} data-position="${toy.position}" data-look="${toy.look}" aria-label="Move ${names[f]}${f !== 'can' ? ' or bring a flower aboard' : ''}">${toyArt(f, toy.look)}</button>
+      ${world.flower === f ? `<button class="flower" data-source="flower" data-owner="${f}" aria-label="Move flower from ${names[f]}">${flowerArt}</button>` : ''}
+    </div>`;
+}
+function render() {
+  const focusBefore = document.activeElement;
+  const focusSource = focusBefore?.dataset.source;
+  const focusDest = focusBefore?.dataset.dest;
+  const focusId = focusBefore?.id;
+  $('#toy-title').textContent = names[family];
+  const order = ['seedbed', 'pond-left', 'rest-left', 'pond-right', 'rest-right'];
+  $('#zones').innerHTML = order.map(position => {
+    const picture = position === 'seedbed' ? zoneArt.seedbed : position.startsWith('pond') ? zoneArt.pond : zoneArt.rest;
+    const grown = position === 'seedbed' && world.flower === 'seedbed';
+    return `<div class="zone" data-place="${position}">
+      <button class="destination" data-dest="${position}" ${grown ? 'data-source="flower" data-owner="seedbed"' : ''} aria-label="${grown ? 'Pick the flower or water the seeds' : labels[position]}">${grown ? flowerArt : picture}<span class="zone-label">${labels[position]}</span></button>
+      ${families.filter(f => world.toys[f]?.position === position).map(renderToy).join('')}
+    </div>`;
+  }).join('');
+  $('#toys').innerHTML = '';
+  if (currentParts().length === count) {
+    $('#work').innerHTML = `<div class="full-toy">${toyArt(family, world.toys[family].look)}</div><p>Your toy is ready. Take it into the garden.</p>
+      <div class="remix"><button id="preview-look" aria-label="Preview a new look">${toyArt(family, 1 - world.toys[family].look)}Try a new look</button></div>
+      ${preview !== null ? `<div class="preview">${toyArt(family, preview)}</div><div class="remix"><button id="apply-look" class="primary">Use this look</button><button id="cancel-look">Keep this look</button></div>` : ''}`;
+  } else {
+    const parts = currentParts();
+    const available = groups(count).map((_, i) => i).filter(i => !parts.includes(i)).slice(0, 2);
+    $('#work').innerHTML = `<div class="assembly">${groups(count).map((_, i) => `<button class="slot" data-slot="${i}" data-dest="slot:${i}" data-filled="${parts.includes(i)}" aria-label="${parts.includes(i) ? 'Joined' : 'Place'} ${partNames[family][groups(count)[i][0]]}">${partArt(family, count, i)}</button>`).join('')}</div>
+      <div class="tray">${available.map(i => `<button class="piece" data-source="part:${i}" aria-label="Pick ${partNames[family][groups(count)[i][0]]}">${partArt(family, count, i)}<span class="part-label">${partNames[family][groups(count)[i][0]]}</span></button>`).join('')}</div>`;
+  }
+  $('#hint-text').textContent = currentParts().length === count ? 'Pick a toy. Choose a place.' : 'Pick a piece. Find its shape.';
+  markSelection();
+  const replacement = focusSource ? document.querySelector(`[data-source="${focusSource}"]`)
+    : focusDest ? document.querySelector(`[data-dest="${focusDest}"]`)
+    : focusId ? document.getElementById(focusId) : null;
+  replacement?.focus({ preventScroll: true });
+}
+function markSelection() {
+  document.querySelectorAll('[data-source]').forEach(element => element.setAttribute('aria-pressed', String(element.dataset.source === selection)));
+  document.querySelectorAll('[data-dest]').forEach(element => {
+    const destination = element.dataset.dest;
+    const matches = selection?.startsWith('part:') ? destination === selection.replace('part:', 'slot:')
+      : selection === 'toy:boat' ? destination.startsWith('pond-')
+      : selection === 'toy:wagon' ? destination.startsWith('rest-')
+      : selection === 'toy:can' ? destination === 'seedbed' || destination.startsWith('rest-')
+      : selection === 'flower' ? destination === 'seedbed' || destination.startsWith('carrier:') : false;
+    element.classList.toggle('suggested', matches);
+  });
+}
+function commit(source, destination) {
+  let changed = false;
+  if (source?.startsWith('part:') && destination?.startsWith('slot:')) {
+    const part = Number(source.split(':')[1]), slot = Number(destination.split(':')[1]);
+    if (part === slot && Number.isInteger(part) && part >= 0 && part < count && !currentParts().includes(part)) {
+      currentParts().push(part);
+      if (currentParts().length === count) {
+        world.toys[family] ??= { position: family === 'boat' ? 'pond-left' : 'rest-left', look: 0 };
+        say('You made a toy! See what it can do.');
+      } else say('These pieces fit together.');
+      changed = true;
+    }
+  } else if (source?.startsWith('toy:') && locations.includes(destination)) {
+    const f = source.split(':')[1], toy = world.toys[f];
+    const allowed = f === 'boat' ? destination.startsWith('pond-') : f === 'wagon' ? destination.startsWith('rest-') : destination === 'seedbed' || destination.startsWith('rest-');
+    if (toy && allowed) {
+      toy.position = destination;
+      if (f === 'can' && destination === 'seedbed') {
+        world.flower ??= 'seedbed'; say('A little water. A lovely flower!');
+      } else say(`${names[f]} found a new place.`);
+      changed = true;
+    }
+  } else if (source === 'flower' && world.flower) {
+    const carrier = destination?.split(':')[1];
+    if (destination === 'seedbed' || (destination?.startsWith('carrier:') && ['boat', 'wagon'].includes(carrier) && world.toys[carrier])) {
+      world.flower = destination === 'seedbed' ? 'seedbed' : carrier;
+      say('Your flower is coming along.'); changed = true;
+    }
+  }
+  if (changed) { selection = null; save(); render(); chime(); $('#zones').classList.remove('reaction'); void $('#zones').offsetWidth; $('#zones').classList.add('reaction'); }
+  else { say('Try another place. Your garden is still here.'); markSelection(); }
+  return changed;
+}
+function cancelDrag() {
+  if (drag) {
+    drag.element.classList.remove('dragging');
+    if (drag.element.hasPointerCapture?.(drag.id)) drag.element.releasePointerCapture(drag.id);
+  }
+  drag = null; $('#ghost').hidden = true;
+}
+function destinationAt(x, y) {
+  const candidates = [...document.querySelectorAll('[data-dest]')].map(element => {
+    const r = element.getBoundingClientRect();
+    const inside = x >= r.left - 12 && x <= r.right + 12 && y >= r.top - 12 && y <= r.bottom + 12;
+    return { element, inside, distance: Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2)) };
+  }).filter(item => item.inside).sort((a, b) => a.distance - b.distance);
+  return candidates[0]?.element.dataset.dest;
+}
+$('#game').addEventListener('pointerdown', event => {
+  const element = event.target.closest('[data-source]');
+  if (!element || drag || event.button > 0) return;
+  drag = { element, source: element.dataset.source, id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+  if (element.setPointerCapture && event.isTrusted) element.setPointerCapture(event.pointerId);
+});
+$('#game').addEventListener('pointermove', event => {
+  if (!drag || event.pointerId !== drag.id) return;
+  if (Math.hypot(event.clientX - drag.x, event.clientY - drag.y) > 8) drag.moved = true;
+  if (!drag.moved) return;
+  drag.element.classList.add('dragging');
+  $('#ghost').innerHTML = drag.element.querySelector('svg').outerHTML;
+  $('#ghost').hidden = false; $('#ghost').style.left = `${event.clientX - 48}px`; $('#ghost').style.top = `${event.clientY - 48}px`;
+});
+$('#game').addEventListener('pointerup', event => {
+  if (!drag || event.pointerId !== drag.id) return;
+  const { source, moved } = drag;
+  const destination = destinationAt(event.clientX, event.clientY);
+  cancelDrag();
+  if (moved) {
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 0);
+    commit(source, destination);
+  }
+});
+$('#game').addEventListener('pointercancel', event => { if (event.pointerId === drag?.id) cancelDrag(); });
+$('#game').addEventListener('lostpointercapture', event => { if (event.pointerId === drag?.id) cancelDrag(); });
+window.addEventListener('resize', cancelDrag);
+$('#game').addEventListener('click', event => {
+  if (suppressClick) return;
+  const source = event.target.closest('[data-source]'), destination = event.target.closest('[data-dest]');
+  if (destination && selection && (!source || selection === 'flower' || destination.dataset.dest === 'seedbed')) commit(selection, destination.dataset.dest);
+  else if (source) { selection = source.dataset.source === selection ? null : source.dataset.source; markSelection(); say('Now choose its place.'); }
+  else if (destination && selection) commit(selection, destination.dataset.dest);
+  else if (event.target.closest('#preview-look')) { preview = 1 - world.toys[family].look; render(); }
+  else if (event.target.closest('#apply-look')) { world.toys[family].look = preview; preview = null; save(); render(); say('A new look. Still your wonderful toy.'); }
+  else if (event.target.closest('#cancel-look')) { preview = null; render(); }
+});
+function openParents() {
+  cancelDrag(); selection = null; preview = null; markSelection();
+  $('#gate').hidden = false; $('#settings').hidden = true; $('#reset-confirm').hidden = true;
+  $('#family').value = family; $('#count').value = String(count);
+  $('#caregiver').showModal();
+}
+$('#parents').addEventListener('click', openParents);
+$('#other-toy').addEventListener('click', openParents);
+$('#open-settings').addEventListener('click', () => { $('#gate').hidden = true; $('#settings').hidden = false; $('#family').focus(); });
+document.querySelectorAll('.close-dialog').forEach(button => button.addEventListener('click', () => {
+  if (!$('#settings').hidden) { family = $('#family').value; count = Number($('#count').value); render(); }
+  $('#caregiver').close();
+}));
+$('#play').addEventListener('click', () => { $('#welcome').hidden = true; $('#game').hidden = false; render(); });
+$('#sound').addEventListener('click', async () => {
+  $('#sound').disabled = true;
+  try {
+    if (sound) {
+      sound = false;
+      for (const tone of tones) tone.stop();
+      tones.clear();
+      await audio.suspend();
+      $('#sound').textContent = 'Enable gentle sounds';
+      $('#audio-status').textContent = 'Sound is off. Everything works silently.';
+    } else {
+      const Constructor = window.AudioContext || window.webkitAudioContext;
+      if (!Constructor) throw new Error('Web Audio unavailable');
+      audio ??= new Constructor(); await audio.resume(); sound = true;
+      $('#sound').textContent = 'Mute all sounds'; $('#audio-status').textContent = 'Gentle sounds enabled.'; chime();
+    }
+  } catch (error) { audioFailure(error); }
+  finally { $('#sound').disabled = false; }
+});
+$('#reset').addEventListener('click', () => { $('#reset-confirm').hidden = false; });
+$('#reset-no').addEventListener('click', () => { $('#reset-confirm').hidden = true; });
+$('#reset-yes').addEventListener('click', () => {
+  world = fresh(); saveProblem = false; selection = null; preview = null; save(); render(); $('#reset-confirm').hidden = true;
+});
+async function verifyOffline(worker) {
+  try {
+    const channel = new MessageChannel();
+    const reply = new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('Cache verification timed out')), 8000);
+      channel.port1.onmessage = event => { clearTimeout(timeout); channel.port1.close(); resolve(event.data); };
+    });
+    worker.postMessage({ type: 'CHECK_CACHE' }, [channel.port2]);
+    const result = await reply;
+    if (!result.ready) throw new Error('Play shell is not fully cached');
+    $('#offline-status').textContent = 'Ready offline';
+  } catch (error) { offlineFailure(error); }
+}
+function offlineFailure(error) {
+  $('#offline-status').textContent = 'Offline play is unavailable. You can still play while this page is open.';
+  console.warn('Garden offline setup failed:', error);
+}
+async function setupOffline() {
+  if (location.protocol === 'file:' || !('serviceWorker' in navigator)) {
+    $('#offline-status').textContent = 'Offline caching is unavailable here. The downloaded HTML can play on a desktop.'; return;
+  }
+  try {
+    const registration = await navigator.serviceWorker.register('./sw.js', { scope: './', updateViaCache: 'none' });
+    const inspect = () => {
+      if (registration.waiting) { waitingWorker = registration.waiting; $('#update').hidden = false; }
+    };
+    inspect();
+    registration.addEventListener('updatefound', () => {
+      const worker = registration.installing;
+      worker.addEventListener('statechange', () => {
+        if (worker.state === 'installed') { inspect(); if (registration.active) verifyOffline(registration.active); }
+        if (worker.state === 'redundant' && !registration.active) offlineFailure(new Error('Cache installation failed'));
+      });
+    });
+    if (registration.active) await verifyOffline(registration.active);
+    else {
+      const worker = registration.installing;
+      if (worker) worker.addEventListener('statechange', () => {
+        if (worker.state === 'activated') verifyOffline(worker);
+        if (worker.state === 'redundant') offlineFailure(new Error('Cache installation failed'));
+      });
+    }
+  } catch (error) { offlineFailure(error); }
+}
+$('#update').addEventListener('click', () => {
+  if (!waitingWorker || !save()) return;
+  navigator.serviceWorker.addEventListener('controllerchange', () => location.reload(), { once: true });
+  waitingWorker.postMessage({ type: 'ACTIVATE_UPDATE' });
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden) { cancelDrag(); if (!saveProblem) save(); } });
+render(); setupOffline();
+</script>
+</body>
+</html>

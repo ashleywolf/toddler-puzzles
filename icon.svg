@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>:root{--cp-bg:#f7f4ef;--cp-success:#16a34a;--cp-accent:#b11f4b;--cp-warning:#f59e0b}@media(prefers-color-scheme:dark){:root{--cp-bg:#3d3b3a;--cp-success:#4ade80;--cp-accent:#fd8ea1;--cp-warning:#fbbf24}}</style>
+<rect width="120" height="120" rx="16" fill="var(--cp-bg)"/>
+<path d="M60 105V45M60 85Q20 55 25 83M60 80Q95 52 95 80" stroke="var(--cp-success)" stroke-width="7" fill="var(--cp-success)"/>
+<path d="M60 49C12 43 28 8 55 26C72-6 109 18 81 40C111 56 78 86 60 49" fill="var(--cp-accent)"/>
+<circle cx="62" cy="41" r="12" fill="var(--cp-warning)"/>
+</svg>
